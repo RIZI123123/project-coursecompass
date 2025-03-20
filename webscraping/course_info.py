@@ -45,22 +45,19 @@ driver.get("https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm")
 time.sleep(3)
 check_input = driver.find_element(By.LINK_TEXT, "Course Campus")
 check_input.click()
+
 time.sleep(2)
 campus_select = driver.find_element(By.NAME, "selectCampusBox")
 select = Select(campus_select)
 select.select_by_visible_text("Keele")
 select.deselect_by_visible_text("Catholic Education Centre")
+
 time.sleep(1)
 check_input = driver.find_element(By.NAME, "3.10.7.5")
 check_input.click()
 courselist_page = driver.page_source
 
-#HomePageSoup = BeautifulSoup(home_page.text, "lxml")
 CourselistPageSoup = BeautifulSoup(courselist_page, "lxml")
-# get the link to the Course Campus Search
-
-#soup = BeautifulSoup(all_course_page.text,"lxml")
-
 tables_tags = CourselistPageSoup.find_all("table")
 print(len(tables_tags[4].find_all('tr')))
 tables_rows = tables_tags[4].find_all('tr')
@@ -76,14 +73,15 @@ for rows in tables_rows[4:7]:#goes through each course in list according to spec
     courseInfoSoup = BeautifulSoup(courseInfo_page, "lxml")
 
     tables = courseInfoSoup.find_all('table')
-    
     Title = tables[4].find('h1')
     title_str = str(Title.text)
     #print(Title.text)
+
     paragraphs = tables[4].find_all('p')
     Description = paragraphs[4]
     desc_str = str(Description.text)
     #print(Description.text)
+
     course = {}
     course['subject'] = title_str[3:7]
     print(course["subject"])
@@ -97,5 +95,7 @@ for rows in tables_rows[4:7]:#goes through each course in list according to spec
     print(course['name'])
     course['description'] = desc_str
     print(course['description'])
+    list_of_courses.append(course)
+
     time.sleep(5)
     driver.back()
