@@ -62,9 +62,30 @@ tables_tags = CourselistPageSoup.find_all("table")
 print(len(tables_tags[4].find_all('tr')))
 tables_rows = tables_tags[4].find_all('tr')
 
+def getPre(desc : str):
+  preReq = ""
+  begin = desc.find("Prerequisite")
+  exclude = ["Course Credit Exclusion", "Corequisite"]
+  text = desc[begin:]
+  for word in exclude:
+     end = desc.find(word)
+     if (end <= len(desc)):
+        text = desc[begin:end]
+        break
+     
+  if (text == "."):
+     return ""
+  
+  courses = re.findall(r"[A-Z][A-Z][A-Z]?[A-Z]? [0-9]*", text)
+  #print(courses)
+  for preQ in courses:
+     preReq = preReq + "," + preQ
+  preReq = preReq[1:]
+  return preReq
+
 list_of_courses = []
 
-for rows in tables_rows[4:7]:#goes through each course in list according to specifies range.
+for rows in tables_rows[10:13]:#goes through each course in list according to specifies range.
     time.sleep(2)
     columns = rows.find('a')
     print(columns['href'])
@@ -91,11 +112,16 @@ for rows in tables_rows[4:7]:#goes through each course in list according to spec
     print(course["number"])
     course['credits'] = title_str[15:19]
     print(course['credits'])
-    course['name'] = title_str[22:]
+    course['name'] = title_str[22:].strip()
     print(course['name'])
     course['description'] = desc_str
     print(course['description'])
+    course['prerequisites'] = getPre(desc_str)
+    print(course['prerequisites'])
     list_of_courses.append(course)
 
     time.sleep(5)
     driver.back()
+
+with open('data.json', 'w') as f:     
+    f.write(json.dumps(list_of_courses, indent= 1))
