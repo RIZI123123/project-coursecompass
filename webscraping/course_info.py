@@ -42,11 +42,11 @@ base_url = "https://w2prod.sis.yorku.ca"
 
 ## Open the Home Page
 driver.get("https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm")
-time.sleep(3)
+time.sleep(random.randint(3, 6))
 check_input = driver.find_element(By.LINK_TEXT, "Course Campus")
 check_input.click()
 
-time.sleep(2)
+time.sleep(random.randint(2, 3))
 campus_select = driver.find_element(By.NAME, "selectCampusBox")
 select = Select(campus_select)
 select.select_by_visible_text("Keele")
@@ -76,7 +76,7 @@ def getPre(desc : str):
   if (text == "."):
      return ""
   
-  courses = re.findall(r"[A-Z][A-Z][A-Z]?[A-Z]? [0-9]*", text)
+  courses = re.findall(r"[A-Z][A-Z][A-Z]?[A-Z]? [0-9]{4}", text)
   #print(courses)
   for preQ in courses:
      preReq = preReq + "," + preQ
@@ -85,8 +85,8 @@ def getPre(desc : str):
 
 list_of_courses = []
 
-for rows in tables_rows[10:13]:#goes through each course in list according to specifies range.
-    time.sleep(2)
+for rows in tables_rows[6:9]:#goes through each course in list according to specifies range.
+    time.sleep(random.randint(4, 10))
     columns = rows.find('a')
     print(columns['href'])
     driver.get("https://w2prod.sis.yorku.ca" + columns['href'])
@@ -103,6 +103,16 @@ for rows in tables_rows[10:13]:#goes through each course in list according to sp
     desc_str = str(Description.text)
     #print(Description.text)
 
+    professors = []
+    sections = courseInfoSoup.find_all('td', colspan=3)
+
+    for sect in sections[1::2]:
+       profs = sect.find_all('a')
+       for x in range(1, len(profs)):
+          if (x % 2 == 1):
+             professors.append(str(profs[x].text).replace("\xa0", " "))
+             #print(profs[x].text)
+
     course = {}
     course['subject'] = title_str[3:7]
     print(course["subject"])
@@ -118,9 +128,11 @@ for rows in tables_rows[10:13]:#goes through each course in list according to sp
     print(course['description'])
     course['prerequisites'] = getPre(desc_str)
     print(course['prerequisites'])
+    course['professors'] = list(set(professors))
+    print(course['professors'])
     list_of_courses.append(course)
 
-    time.sleep(5)
+    time.sleep(random.randint(7, 12))
     driver.back()
 
 with open('data.json', 'w') as f:     
