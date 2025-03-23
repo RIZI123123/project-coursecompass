@@ -86,7 +86,7 @@ def getPre(desc : str):
 list_of_courses = []
 
 for rows in tables_rows[6:9]:#goes through each course in list according to specifies range.
-    time.sleep(random.randint(4, 10))
+    time.sleep(random.randint(4, 13))
     columns = rows.find('a')
     print(columns['href'])
     driver.get("https://w2prod.sis.yorku.ca" + columns['href'])
