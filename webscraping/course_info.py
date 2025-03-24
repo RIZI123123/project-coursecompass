@@ -62,10 +62,12 @@ tables_tags = CourselistPageSoup.find_all("table")
 print(len(tables_tags[4].find_all('tr')))
 tables_rows = tables_tags[4].find_all('tr')
 
-def getPre(desc : str):
-  preReq = ""
-  begin = desc.find("Prerequisite")
-  exclude = ["Course Credit Exclusion", "Corequisite"]
+def getPre(desc : str, course : str):
+  preReq = []
+  desc = desc.lower()
+  course = course.lower()
+  begin = desc.find("prerequisite")
+  exclude = ["course credit exclusion", "corequisite"]
   text = desc[begin:]
   for word in exclude:
      end = desc.find(word)
@@ -76,16 +78,17 @@ def getPre(desc : str):
   if (text == "."):
      return ""
   
-  courses = re.findall(r"[A-Z][A-Z][A-Z]?[A-Z]? [0-9]{4}", text)
+  courses = re.findall(r"[a-z][a-z][a-z]?[a-z]? [0-9]{4}", text)
   #print(courses)
   for preQ in courses:
-     preReq = preReq + "," + preQ
-  preReq = preReq[1:]
+     preQ = str(preQ)
+     if (preQ != course):
+        preReq.append(preQ.upper())
   return preReq
 
 list_of_courses = []
 
-for rows in tables_rows[6:9]:#goes through each course in list according to specifies range.
+for rows in tables_rows[4:40]:#goes through each course in list according to specifies range.
     time.sleep(random.randint(4, 13))
     columns = rows.find('a')
     print(columns['href'])
@@ -126,7 +129,7 @@ for rows in tables_rows[6:9]:#goes through each course in list according to spec
     print(course['name'])
     course['description'] = desc_str
     print(course['description'])
-    course['prerequisites'] = getPre(desc_str)
+    course['prerequisites'] = list(set(getPre(desc_str, course['code'])))
     print(course['prerequisites'])
     course['professors'] = list(set(professors))
     print(course['professors'])

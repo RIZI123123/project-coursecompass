@@ -10,5 +10,5 @@ for i in data[0:]:
         if(str(j['prerequisites']).__contains__(str(i['code']))):
             i['postrequisites'].append(j['code'])
 
-with open("data.json", 'w') as f:
+with open("ACTG.json", 'w') as f:
     f.write(json.dumps(data, indent= 1))
